@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .ultrawrapper {
+            background-color: beige;
+        }
+        .vypln1 {
+            height: 100px;
+            width: 100%;
+            background-color: beige;
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+        }
+        #tlactym {
+            height: fit-content;
+            width: fit-content;
+            padding: 10px;
+            background-color: aquamarine;
+            font-size: x-large;
+        }
+        .vypln2 {
+            height: 500px;
+            width: 100%;
+            background-color: beige;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #tlacstahnout {
+            height: fit-content;
+            width: fit-content;
+            padding: 10px;
+        }
+
+
+        .toceni {
+            display: flex;
+            gap: 20px;
+            width: max-content;
+            animation: move 15s linear infinite;
+        }
+
+        .tym {
+        width: 200px;
+        height: 120px;
+        background: #4f46e5;
+        border-radius: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+
+        @keyframes move {
+        from {
+            transform: translateX(-100%);
+        }
+        to {
+            transform: translateX(100vw);
+        }
+        }
+    </style>
+</head>
+<body>
+    <div class="ultrawrapper">
+        <div class="vypln1">
+            <button id="tlactym">Který tým je nejlepší</button>
+        </div>
+
+        <div class="toceni">
+            <div class="tym">tým1</div>
+            <div class="tym">tým2</div>
+            <div class="tym">tým3</div>
+            <div class="tym">tým4</div>
+            <div class="tym">tým5</div>
+        </div>
+
+        <div class="vypln2">
+            <button id="tlacstahnout">Stáhnout</button>
+        </div>
+
+
+
+
+
+    </div>
+</body>
+</html>
