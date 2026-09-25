@@ -34,35 +34,47 @@
         #tlacstahnout {
             height: fit-content;
             width: fit-content;
-            padding: 10px;
+            font-size: xx-large;
+            color: yellow;
+            background-color: rgb(3, 160, 3);
+            border-radius: 50%;
+            padding: 20px;
         }
 
-
-        .toceni {
+        .toceniwrapper {
+            width: 100%;
+            overflow: hidden;
+        }
+        .toceni1 {
             display: flex;
             gap: 20px;
             width: max-content;
-            animation: move 15s linear infinite;
+            animation: scroll 5s linear infinite;
         }
-
+        
         .tym {
-        width: 200px;
-        height: 120px;
-        background: #4f46e5;
-        border-radius: 20px;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+            width: 500px;
+            height: 320px;
+            background: #4f46e5;
+            border-radius: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #vysledek {
+            background-color: antiquewhite;
+            color: black;
+            border: 1px solid grey;
         }
 
-        @keyframes move {
-        from {
-            transform: translateX(-100%);
-        }
-        to {
-            transform: translateX(100vw);
-        }
+        @keyframes scroll {
+            from {
+            transform: translateX(0);
+            }
+            to {
+            transform: translateX(-2580px);
+            }
         }
     </style>
 </head>
@@ -71,23 +83,36 @@
         <div class="vypln1">
             <button id="tlactym">Který tým je nejlepší</button>
         </div>
-
-        <div class="toceni">
-            <div class="tym">tým1</div>
-            <div class="tym">tým2</div>
-            <div class="tym">tým3</div>
-            <div class="tym">tým4</div>
-            <div class="tym">tým5</div>
+        <div class="toceniwrapper">
+            <div class="toceni1">
+                <div class="tym">tým1</div>
+                <div class="tym">tým2</div>
+                <div class="tym">tým3</div>
+                <div class="tym">tým4</div>
+                <div class="tym">tým5</div>
+                <div class="tym">tým1</div>
+                <div class="tym">tým2</div>
+                <div class="tym">tým3</div>
+                <div class="tym">tým4</div>
+                <div class="tym">tým5</div>
+                <div class="tym">tým1</div>
+                <div class="tym">tým2</div>
+                <div class="tym">tým3</div>
+                <div class="tym">tým4</div>
+                <div class="tym">tým5</div>
         </div>
-
         <div class="vypln2">
+            <div id="vysledek"></div>
             <button id="tlacstahnout">Stáhnout</button>
         </div>
-
-
-
-
-
     </div>
+    <script>
+        const tlacitko = document.getElementById("tlactym");
+        const vysledek = document.getElementById("vysledek");
+
+        tlacitko.addEventListener("click", () => {
+            vysledek.textContent = "Kubíkův a Rdečkův tým je nejlepší!";
+        });
+</script>
 </body>
 </html>
