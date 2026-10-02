@@ -22,6 +22,7 @@
             padding: 10px;
             background-color: aquamarine;
             font-size: x-large;
+            border-radius: 10px;
         }
         .vypln2 {
             height: 500px;
@@ -39,6 +40,7 @@
             background-color: aquamarine;
             font-size: x-large;
             display: block;
+            border-radius: 10px;
         }
 
         .toceniwrapper {
@@ -61,6 +63,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 50px;
         }
         #vysledek {
             background-color: rgb(149, 248, 243);
@@ -68,7 +71,7 @@
             padding: 20px;
             color: rgb(42, 92, 255);
             border: 1px solid grey;
-            
+            border-radius: 25px;
         }
 
         @keyframes scroll {
@@ -115,7 +118,7 @@
         const vysledek = document.getElementById("vysledek");
 
         tlacitko.addEventListener("click", () => {
-            vysledek.textContent = "Kubíkův a Rdečkův tým je nejlepší!";
+            vysledek.textContent = "Kubíkův a Radečkův tým je nejlepší!";
         });
         function stahnout() {
         const a = document.createElement("a");
