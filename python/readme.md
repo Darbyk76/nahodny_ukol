@@ -2,6 +2,9 @@
 ## instrukce pro spuštění:
  - stáhnout si soubor sifra.py z webu od Radka
  - spustit soubor
+  - v terminálu napiště pip install cryptography
+  - jakmile bude nainstalovaná knihovna můžete pokročit na další bod
+ - spustit soubor
  ## příkazy
   - číst - dešifruje a přečte co je v souboru
    - psát - můžete přidávat text k šifrování
