@@ -34,11 +34,9 @@
         #tlacstahnout {
             height: fit-content;
             width: fit-content;
-            font-size: xx-large;
-            color: yellow;
-            background-color: rgb(3, 160, 3);
-            border-radius: 50%;
-            padding: 20px;
+            padding: 10px;
+            background-color: aquamarine;
+            font-size: x-large;
         }
 
         .toceniwrapper {
@@ -49,13 +47,13 @@
             display: flex;
             gap: 20px;
             width: max-content;
-            animation: scroll 5s linear infinite;
+            animation: scroll 20s linear infinite;
         }
         
         .tym {
             width: 500px;
             height: 320px;
-            background: #4f46e5;
+            background: #b0d7fc;
             border-radius: 20px;
             color: white;
             display: flex;
@@ -103,7 +101,7 @@
         </div>
         <div class="vypln2">
             <div id="vysledek"></div>
-            <button id="tlacstahnout">Stáhnout</button>
+            <button id="tlacstahnout" onclick="stahnout()">Stáhnout</button>
         </div>
     </div>
     <script>
@@ -113,6 +111,12 @@
         tlacitko.addEventListener("click", () => {
             vysledek.textContent = "Kubíkův a Rdečkův tým je nejlepší!";
         });
+        function stahnout() {
+        const a = document.createElement("a");
+        a.href = "../python/sifra.py";
+        a.download = "sifra.py";
+        a.click();
+        }
 </script>
 </body>
 </html>
