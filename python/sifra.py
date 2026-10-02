@@ -7,7 +7,7 @@ import os
 
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
-json_path = dir_path + "\data.json"
+json_path = dir_path + "\data.txt"
 print(json_path)
 
 
@@ -76,6 +76,7 @@ def decrypt(encrypted_data: bytes, password: str) -> bytes:  # dešifrování
 # načtení dat
 def load_data(heslo, json_path):
     if not os.path.exists(json_path):
+        print(json_path)
         return None, False
     if os.path.getsize(json_path) == 0:
         return new_data(heslo, json_path)
@@ -89,7 +90,8 @@ def load_data(heslo, json_path):
             data = json.loads(json_string)
             return data
     except Exception as e:
-        print(f"nelze: {e}")
+        print(f"nelze: {e} problemops")
+
         return None
 
 
