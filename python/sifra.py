@@ -19,94 +19,108 @@ data = {}
 print("Vítejte v šifrující aplikaci RaDeK_šifra")
 print("Veškeré příkazy: číst, psát, příkazy")
 
-def new_data():
-    plain_data = {
-        "salt": "",
-        "nonce": "",
-        "user_data":""
-    }
-    save(plain_data)
-    return plain_data, True
-
-def save(data):
-    with open(json_path,"w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent = 4)
-
-
-def load():
-    if  os.path.getsize(json_path) == 0:
-        print("Nula")
-        return new_data()
-    else:
-        try:
-            with open(json_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                print("čtu")
-        except:
-            with open(json_path,"w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent = 4)
-                print("vytvořil jsem")
-            with open(json_path, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                        print("čtu")
-        return data
-   
-
-def zasifrovat(data:bytes,heslo:str):
-    salt = os.urandom(16)
-
-    key = derive_key(heslo, salt)
-
-    nonce = os.urandom(12)
-
-    aes = AESGCM(key)
-
-    zasifrovana_data = aes.encrypt(
-        nonce,
-        data,
-        None
-    )
-    data[salt] = salt
-    data[nonce] = nonce
-    data[user_data] = zasifrovana_data
-
-    return salt,nonce, zasifrovana_data
-
-def desifruji(sifrovane:bytes, heslo:str) -> bytes:
-    print("Dešifruji")
-    if  os.path.getsize() == 0:
-        print("Nula")
-        return new_data(heslo, json_path)
-    print("více jak 0")
-    salt = data[salt]
-    nonce = data[nonce]
-    data = data[data]
-
-    key = derive_key(heslo, salt)
-
-    aes = AESGCM(key)
-    
-    return aes.decrypt(
-        nonce,
-        data,
-        None
-    )
-
-
-
-def derive_key(password:str, salt:bytes)-> bytes:
-    
+# ZÍSKÁNÍ KLÍČE
+def derive_key(password: str, salt: bytes) -> bytes:
+    password  # .encode() zjistit proč encode - encode se dává pokud chcem dát string na nějkou věc - utf-8 ascii atd. proč? idk
     kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=1_200_000
-
+        algorithm=hashes.SHA256(), length=32, salt=salt, iterations=1_200_000
     )
-    
-    key = kdf.derive(password.encode("utf-8"))
+
+    key = kdf.derive(password.encode())
     print(f"{key.hex()} je klic")
     return key
+
+
+# Š I F R O V Á N Í
+def encrypt(data: bytes, password: str):  # šifrování
+    print("Sifruji")
+
+    salt = os.urandom(16)  # generuju salt, 16 bitů
+
+    key = derive_key(
+        password, salt
+    )  # generuju klíč přes volání funkce, zadávám heslo a salt(může být veřejný)
+
+    nonce = os.urandom(
+        12
+    )  # generuji nonce - číslo co je jen jednou použito při šifrování
+
+    aes = AESGCM(key)
+
+    crypted_text = aes.encrypt(nonce, data, None)
+    print(f"Crypted text: {crypted_text}")
+    print(
+        f"vracím:{salt+nonce+crypted_text} kde salt je: {salt} nonce je {nonce} a crypted text je {crypted_text}"
+    )
+    return salt + nonce + crypted_text  # vracím salt nonce a šifrovaný text
+
+
+# D E Š I F R O V Á N Í
+def decrypt(encrypted_data: bytes, password: str) -> bytes:  # dešifrování
+    print("desifruji")
+    salt = encrypted_data[0:16]
+    print(f"SALT: {salt}")
+    nonce = encrypted_data[16:28]
+    print(f"NONCE: {nonce}")
+    data = encrypted_data[28:]
+    print(f"DATAAA: {data}")
+
+    key = derive_key(password, salt)
+
+    aes = AESGCM(key)
+
+    return aes.decrypt(nonce, data, None)
+
+
+# načtení dat
+def load_data(heslo, json_path):
+    if not os.path.exists(json_path):
+        return None, False
+    if os.path.getsize(json_path) == 0:
+        return new_data(heslo, json_path)
+    try:
+        with open(json_path, "rb") as f:
+            data_bytes = f.read()
+
+            print(f"náhodná xxxx ")
+            desifrovana_bytes = decrypt(data_bytes, heslo)
+            json_string = desifrovana_bytes.decode("utf-8")
+            data = json.loads(json_string)
+            return data, True
+    except Exception as e:
+        print(f"nelze: {e}")
+        return None, False
+
+
+# Uložení dat
+def save_data(
+    heslo: str,
+    user_dir_path: str,
+    data: dict,
+):
+    try:
+        json_bytes = json.dumps(data, ensure_ascii=False).encode("utf-8")
+        print(json_bytes)
+        zasifrovano = encrypt(json_bytes, heslo)
+        with open(user_dir_path, "wb") as f:
+            f.write(zasifrovano)
+            return True
+    except Exception as e:
+        print(f"Chyba při uložení: {e}")
+        return False
+
+
+# Pokud již uživatel má svůj soubor ale je prázdný.
+def new_data(heslo, user_dir_path):
+
+    print("nová data")
+    data = {
+        "salt": "",
+        "sifrovane_data": "",
+        "normalni_data": "",
+    }
+    save_data(heslo, user_dir_path, data)
+    return data, True
 
 
 while True:
@@ -119,157 +133,20 @@ while True:
     if prikaz == "psát":
         heslo = input("zadejte heslo:  ")
         try:
-            desifruji(heslo)
+            load_data(heslo, json_path)
+            print("try")
+            zprava = input("Zadejte velmi tajnou zprávu....")
         except:
             print("Špatné heslo...")
-        print("wdgadxwsda")
 
+        print("wdgadxwsda")
+    if prikaz == "číst":
+        print("čtem?")
+        heslo = input("zadejte heslo:  ")
+        try:
+            precteno = load_data(heslo, json_path)
+            print(precteno)
+        except:
+            print("problém")
     else:
         print("Neplatný příkaz...")
-
-#
-# from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-# from cryptography.hazmat.primitives import hashes
-# from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-
-# import json
-# import os
-
-# dir_path = os.path.dirname(os.path.abspath(__file__))
-# json_path = os.path.join(dir_path, "data.json")
-
-# print(json_path)
-
-# print("Vítejte v šifrující aplikaci RaDeK_šifra")
-# print("Veškeré příkazy: číst, psát, příkazy")
-
-
-# def save(data):
-#     with open(json_path, "w", encoding="utf-8") as f:
-#         json.dump(data, f, ensure_ascii=False, indent=4)
-
-
-# def load():
-#     if not os.path.exists(json_path):
-#         save({})
-#         return {}
-
-#     with open(json_path, "r", encoding="utf-8") as f:
-#         try:
-#             return json.load(f)
-#         except json.JSONDecodeError:
-#             return {}
-
-
-# def new_data():
-#     plain_data = {
-#         "salt": "",
-#         "nonce": "",
-#         "user_data": ""
-#     }
-
-#     save(plain_data)
-#     return plain_data
-
-
-# def derive_key(password: str, salt: bytes) -> bytes:
-
-#     kdf = PBKDF2HMAC(
-#         algorithm=hashes.SHA256(),
-#         length=32,
-#         salt=salt,
-#         iterations=1_200_000
-#     )
-
-#     key = kdf.derive(password.encode("utf-8"))
-
-#     print(f"{key.hex()} je klíč")
-#     return key
-
-
-# def zasifrovat(data: bytes, heslo: str):
-
-#     salt = os.urandom(16)
-
-#     key = derive_key(heslo, salt)
-
-#     nonce = os.urandom(12)
-
-#     aes = AESGCM(key)
-
-#     ciphertext = aes.encrypt(
-#         nonce,
-#         data,
-#         None
-#     )
-
-#     ulozena_data = {
-#         "salt": salt.hex(),
-#         "nonce": nonce.hex(),
-#         "user_data": ciphertext.hex()
-#     }
-
-#     save(ulozena_data)
-
-#     return ulozena_data
-
-
-# def desifruji(heslo: str) -> bytes:
-
-#     data = load()
-
-#     if not data:
-#         raise Exception("Žádná data nejsou uložena")
-
-#     salt = bytes.fromhex(data["salt"])
-#     nonce = bytes.fromhex(data["nonce"])
-#     ciphertext = bytes.fromhex(data["user_data"])
-
-#     key = derive_key(heslo, salt)
-
-#     aes = AESGCM(key)
-
-#     return aes.decrypt(
-#         nonce,
-#         ciphertext,
-#         None
-#     )
-
-
-# while True:
-
-#     print()
-#     prikaz = input(": ")
-
-#     if prikaz == "příkazy":
-#         print("Veškeré příkazy: číst, psát, příkazy")
-
-#     elif prikaz == "psát":
-
-#         heslo = input("zadejte heslo: ")
-#         text = input("zadejte text: ")
-
-#         zasifrovat(
-#             text.encode("utf-8"),
-#             heslo
-#         )
-
-#         print("Data uložena.")
-
-#     elif prikaz == "číst":
-
-#         heslo = input("zadejte heslo: ")
-
-#         try:
-#             plaintext = desifruji(heslo)
-
-#             print(
-#                 "Dešifrováno:",
-#                 plaintext.decode("utf-8")
-#             )
-
-#         except Exception:
-#             print("Špatné heslo nebo poškozená data.")
-
-#     else:
-#         print("Neplatný příkaz...")
