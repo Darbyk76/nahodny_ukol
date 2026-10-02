@@ -13,7 +13,7 @@ print(json_path)
 
 
 data = {}
-
+# sul = ""
 
 
 print("Vítejte v šifrující aplikaci RaDeK_šifra")
@@ -27,7 +27,7 @@ def derive_key(password: str, salt: bytes) -> bytes:
     )
 
     key = kdf.derive(password.encode())
-    print(f"{key.hex()} je klic")
+    # print(f"{key.hex()} je klic")
     return key
 
 
@@ -48,22 +48,23 @@ def encrypt(data: bytes, password: str):  # šifrování
     aes = AESGCM(key)
 
     crypted_text = aes.encrypt(nonce, data, None)
-    print(f"Crypted text: {crypted_text}")
-    print(
-        f"vracím:{salt+nonce+crypted_text} kde salt je: {salt} nonce je {nonce} a crypted text je {crypted_text}"
-    )
+    # print(f"Crypted text: {crypted_text}")
+    # print(
+    #     f"vracím:{salt+nonce+crypted_text} kde salt je: {salt} nonce je {nonce} a crypted text je {crypted_text}"
+    # )
+    sul = salt
     return salt + nonce + crypted_text  # vracím salt nonce a šifrovaný text
 
 
 # D E Š I F R O V Á N Í
 def decrypt(encrypted_data: bytes, password: str) -> bytes:  # dešifrování
-    print("desifruji")
+    # print("desifruji")
     salt = encrypted_data[0:16]
-    print(f"SALT: {salt}")
+    # print(f"SALT: {salt}")
     nonce = encrypted_data[16:28]
-    print(f"NONCE: {nonce}")
+    # print(f"NONCE: {nonce}")
     data = encrypted_data[28:]
-    print(f"DATAAA: {data}")
+    # print(f"DATAAA: {data}")
 
     key = derive_key(password, salt)
 
@@ -82,14 +83,14 @@ def load_data(heslo, json_path):
         with open(json_path, "rb") as f:
             data_bytes = f.read()
 
-            print(f"náhodná xxxx ")
+            # print(f"náhodná xxxx ")
             desifrovana_bytes = decrypt(data_bytes, heslo)
             json_string = desifrovana_bytes.decode("utf-8")
             data = json.loads(json_string)
-            return data, True
+            return data
     except Exception as e:
         print(f"nelze: {e}")
-        return None, False
+        return None
 
 
 # Uložení dat
@@ -100,7 +101,7 @@ def save_data(
 ):
     try:
         json_bytes = json.dumps(data, ensure_ascii=False).encode("utf-8")
-        print(json_bytes)
+        # print(json_bytes)
         zasifrovano = encrypt(json_bytes, heslo)
         with open(user_dir_path, "wb") as f:
             f.write(zasifrovano)
@@ -113,14 +114,13 @@ def save_data(
 # Pokud již uživatel má svůj soubor ale je prázdný.
 def new_data(heslo, user_dir_path):
 
-    print("nová data")
+    # print("nová data")
     data = {
-        "salt": "",
-        "sifrovane_data": "",
-        "normalni_data": "",
+        "nešifrovaný text": "",
+        "normalni_data": [],
     }
     save_data(heslo, user_dir_path, data)
-    return data, True
+    return data
 
 
 while True:
@@ -133,9 +133,14 @@ while True:
     if prikaz == "psát":
         heslo = input("zadejte heslo:  ")
         try:
-            load_data(heslo, json_path)
+            data = load_data(heslo, json_path)
             print("try")
             zprava = input("Zadejte velmi tajnou zprávu....")
+            print(f"Data jsoi: {zprava}")
+            data["normalni_data"].append(zprava)
+            print(f"po appendu {zprava} je zprava a data {data}")
+            save_data(heslo, json_path, data)
+
         except:
             print("Špatné heslo...")
 
