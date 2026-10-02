@@ -1,6 +1,8 @@
 # šifrovací textový program
 ## instrukce pro spuštění:
  - stáhnout si soubor sifra.py z webu od Radka
+ - v terminálu napiště pip install cryptography
+  - jakmile bude nainstalovaná knihovna můžete pokročit na další bod
  - spustit soubor
  ## příkazy
   - číst - dešifruje a přečte co je v souboru
